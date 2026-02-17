@@ -6,90 +6,110 @@
     <title>Request Board</title>
     <style>
       :root {
-        --bg: #020202;
-        --paper: #060606;
-        --ink: #f2f2f2;
+        --bg: #0b0b0c;
+        --fg: #f2f2f2;
         --muted: #bdbdbd;
-        --line: #7d7d7d;
+        --line: rgba(242, 242, 242, 0.22);
+        --hair: rgba(242, 242, 242, 0.14);
+        --disabled: rgba(242, 242, 242, 0.45);
+        --track-1: 0.12em;
+        --track-2: 0.18em;
+        --track-3: 0.07em;
       }
 
-      * { box-sizing: border-box; }
+      * {
+        box-sizing: border-box;
+        border-radius: 0;
+      }
 
       body {
         margin: 0;
-        min-height: 100vh;
-        background: radial-gradient(circle at 30% 10%, #111 0%, #040404 45%, #000 100%);
-        color: var(--ink);
-        font-family: "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
-        padding: 16px;
+        background: var(--bg);
+        color: var(--fg);
+        text-transform: uppercase;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: var(--track-3);
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.04;
+        background-image: radial-gradient(circle at 1px 1px, #ffffff 1px, transparent 0);
+        background-size: 8px 8px;
+      }
+
+      main {
+        max-width: 840px;
+        margin: 48px auto 64px;
+        padding: 0 16px;
       }
 
       .sheet {
-        max-width: 860px;
-        margin: 0 auto;
-        border: 2px solid var(--line);
-        background: var(--paper);
-        padding: 16px;
-        box-shadow: 0 18px 60px rgba(0, 0, 0, 0.65);
+        border: 1px solid var(--line);
       }
 
-      .brand {
-        text-align: center;
-        border-bottom: 1px solid var(--line);
-        padding-bottom: 12px;
-        margin-bottom: 12px;
+      .section {
+        padding: 24px 16px;
       }
 
-      .brand h1 {
+      .section + .section {
+        border-top: 1px solid var(--hair);
+      }
+
+      h1,
+      h2 {
         margin: 0;
-        letter-spacing: 0.08em;
-        font-size: clamp(1.5rem, 4.5vw, 2.4rem);
+        letter-spacing: var(--track-1);
         font-weight: 800;
       }
 
-      .brand p {
-        margin: 6px 0 0;
-        color: var(--muted);
-        font-size: 0.9rem;
+      h1 {
+        font-size: 28px;
       }
 
-      .title-row {
-        border: 1px solid var(--line);
-        text-align: center;
-        padding: 8px;
-        font-weight: 700;
-        letter-spacing: 0.05em;
-        margin-bottom: 10px;
+      h2 {
+        font-size: 16px;
+      }
+
+      .subtitle {
+        margin: 12px 0 0;
+        color: var(--muted);
+        letter-spacing: var(--track-2);
+        font-size: 12px;
       }
 
       .grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 10px;
       }
 
-      .box {
-        border: 1px solid var(--line);
-        padding: 10px;
+      .grid > .pane {
+        padding: 24px 16px;
       }
 
-      .box h2 {
-        margin: 0 0 10px;
-        font-size: 0.98rem;
-        letter-spacing: 0.05em;
+      .grid > .pane + .pane {
+        border-left: 1px solid var(--hair);
       }
 
       form {
         display: grid;
-        gap: 10px;
+        gap: 16px;
+      }
+
+      .field {
+        display: grid;
+        gap: 8px;
       }
 
       label {
-        display: block;
-        margin-bottom: 5px;
-        font-size: 0.82rem;
         color: var(--muted);
-        letter-spacing: 0.03em;
+        letter-spacing: var(--track-2);
+        font-weight: 600;
+        font-size: 11px;
       }
 
       input,
@@ -97,126 +117,186 @@
       button {
         width: 100%;
         font: inherit;
+        text-transform: uppercase;
+        letter-spacing: var(--track-3);
       }
 
       input,
       textarea {
-        background: #000;
-        color: var(--ink);
         border: 1px solid var(--line);
-        padding: 9px;
+        background: transparent;
+        color: var(--fg);
+        padding: 12px;
+        font-size: 13px;
+        font-weight: 500;
+      }
+
+      input::placeholder,
+      textarea::placeholder {
+        color: var(--disabled);
+      }
+
+      input:focus,
+      textarea:focus {
+        outline: none;
+        border-color: var(--fg);
       }
 
       textarea {
-        min-height: 130px;
+        min-height: 128px;
         resize: vertical;
       }
 
       button {
-        border: 1px solid var(--ink);
-        background: var(--ink);
-        color: #000;
+        border: 1px solid var(--fg);
+        background: transparent;
+        color: var(--fg);
+        padding: 12px 16px;
+        font-size: 12px;
         font-weight: 700;
-        padding: 9px;
-        letter-spacing: 0.04em;
+        letter-spacing: var(--track-2);
         cursor: pointer;
+        transition: background-color 120ms ease, color 120ms ease, opacity 120ms ease;
       }
 
-      button:disabled { opacity: 0.65; cursor: wait; }
+      button:hover {
+        background: var(--fg);
+        color: var(--bg);
+      }
 
-      .status { min-height: 18px; font-size: 0.86rem; }
-      .ok { color: #d8ffd8; }
-      .err { color: #ffd2d2; }
+      button:active {
+        opacity: 0.85;
+      }
+
+      button:disabled {
+        border-color: var(--disabled);
+        color: var(--disabled);
+        cursor: wait;
+      }
+
+      .status {
+        min-height: 16px;
+        font-size: 11px;
+        letter-spacing: var(--track-2);
+      }
+
+      .ok {
+        color: var(--fg);
+      }
+
+      .err {
+        color: #f0b3b3;
+      }
 
       .table {
         width: 100%;
         border-collapse: collapse;
-        font-size: 0.82rem;
+        font-size: 12px;
+        letter-spacing: var(--track-3);
       }
 
       .table th,
       .table td {
-        border: 1px solid var(--line);
-        padding: 6px;
+        border: 1px solid var(--hair);
+        padding: 8px;
         vertical-align: top;
       }
 
       .table th {
-        text-align: left;
         color: var(--muted);
-        font-weight: 700;
+        font-weight: 600;
+        letter-spacing: var(--track-2);
+        text-align: left;
+      }
+
+      .table td:last-child,
+      .table th:last-child {
+        text-align: right;
       }
 
       .table a {
-        color: var(--ink);
-        text-decoration: underline;
-        text-underline-offset: 2px;
-        font-weight: 700;
+        color: var(--fg);
+        text-decoration: none;
+        border-bottom: 1px solid var(--line);
       }
 
-      .foot {
-        margin-top: 10px;
-        border-top: 1px solid var(--line);
-        padding-top: 8px;
-        color: var(--muted);
-        font-size: 0.76rem;
+      .table a:hover {
+        border-bottom-color: var(--fg);
+      }
+
+      .meta {
         text-align: center;
-        letter-spacing: 0.03em;
+        color: var(--muted);
+        letter-spacing: var(--track-2);
+        font-size: 11px;
       }
 
-      @media (max-width: 780px) {
-        .grid { grid-template-columns: 1fr; }
+      @media (max-width: 800px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+
+        .grid > .pane + .pane {
+          border-left: none;
+          border-top: 1px solid var(--hair);
+        }
+
+        h1 {
+          font-size: 24px;
+        }
       }
     </style>
   </head>
   <body>
-    <main class="sheet">
-      <header class="brand">
-        <h1>REQUEST BOARD</h1>
-        <p>Personal software intake and shipped products log</p>
-      </header>
-
-      <div class="title-row">SUBMIT REQUEST / IMPLEMENTED PRODUCTS</div>
-
-      <section class="grid">
-        <section class="box">
-          <h2>NEW REQUEST</h2>
-          <form id="request-form">
-            <div>
-              <label for="memo">DESCRIPTION</label>
-              <textarea id="memo" name="memo" maxlength="5000" required></textarea>
-            </div>
-
-            <div>
-              <label for="email">EMAIL</label>
-              <input id="email" name="email" type="email" maxlength="320" required />
-            </div>
-
-            <button id="submit-btn" type="submit">SUBMIT</button>
-            <div id="status" class="status" aria-live="polite"></div>
-          </form>
+    <main>
+      <section class="sheet">
+        <section class="section">
+          <h1>Request Personal Software</h1>
+          <p class="subtitle">Submit a build request and receive email notification when delivered.</p>
         </section>
 
-        <aside class="box">
-          <h2>IMPLEMENTED PRODUCTS</h2>
-          <table class="table" aria-label="Implemented products">
-            <thead>
-              <tr>
-                <th>Project</th>
-                <th>Description</th>
-                <th>Updated</th>
-              </tr>
-            </thead>
-            <tbody id="project-table-body">
-              <tr>
-                <td colspan="3">Loading projects...</td>
-              </tr>
-            </tbody>
-          </table>
-        </aside>
-      </section>
+        <section class="grid">
+          <section class="pane">
+            <h2>New Request</h2>
+            <form id="request-form">
+              <div class="field">
+                <label for="memo">Description</label>
+                <textarea id="memo" name="memo" maxlength="5000" placeholder="Describe software request" required></textarea>
+              </div>
 
-      <div class="foot">All submissions are stored via Google Sheets API.</div>
+              <div class="field">
+                <label for="email">Email</label>
+                <input id="email" name="email" type="email" maxlength="320" placeholder="name@example.com" required />
+              </div>
+
+              <button id="submit-btn" type="submit">Submit Request</button>
+              <div id="status" class="status" aria-live="polite"></div>
+            </form>
+          </section>
+
+          <aside class="pane">
+            <h2>Implemented Products</h2>
+            <table class="table" aria-label="Implemented products">
+              <thead>
+                <tr>
+                  <th>Project</th>
+                  <th>Description</th>
+                  <th>Updated</th>
+                </tr>
+              </thead>
+              <tbody id="project-table-body">
+                <tr>
+                  <td colspan="3">Loading projects...</td>
+                </tr>
+              </tbody>
+            </table>
+          </aside>
+        </section>
+
+        <section class="section">
+          <p class="meta">Stored via Google Sheets API</p>
+        </section>
+      </section>
     </main>
 
     <script>
