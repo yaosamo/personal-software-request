@@ -9,5 +9,8 @@
   },
   "devDependencies": {
     "vercel": "^50.18.0"
+  },
+  "dependencies": {
+    "googleapis": "^171.4.0"
   }
 }

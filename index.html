@@ -3,138 +3,265 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Request Personal Software</title>
+    <title>Request Board</title>
     <style>
       :root {
-        --bg: #f5f8ff;
-        --card: #ffffff;
-        --text: #15213a;
-        --accent: #2c5cff;
-        --muted: #63708d;
-        --border: #d9e2ff;
+        --bg: #020202;
+        --paper: #060606;
+        --ink: #f2f2f2;
+        --muted: #bdbdbd;
+        --line: #7d7d7d;
       }
 
-      * {
-        box-sizing: border-box;
-      }
+      * { box-sizing: border-box; }
 
       body {
         margin: 0;
         min-height: 100vh;
-        font-family: "Avenir Next", "Segoe UI", sans-serif;
-        color: var(--text);
-        background: radial-gradient(circle at 15% 20%, #e2eaff 0%, var(--bg) 45%),
-          linear-gradient(120deg, #f9fbff 0%, #ecf2ff 100%);
-        display: grid;
-        place-items: center;
-        padding: 24px;
+        background: radial-gradient(circle at 30% 10%, #111 0%, #040404 45%, #000 100%);
+        color: var(--ink);
+        font-family: "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+        padding: 16px;
       }
 
-      .card {
-        width: min(100%, 600px);
-        background: var(--card);
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        padding: 28px;
-        box-shadow: 0 10px 40px rgba(21, 33, 58, 0.08);
+      .sheet {
+        max-width: 860px;
+        margin: 0 auto;
+        border: 2px solid var(--line);
+        background: var(--paper);
+        padding: 16px;
+        box-shadow: 0 18px 60px rgba(0, 0, 0, 0.65);
       }
 
-      h1 {
+      .brand {
+        text-align: center;
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 12px;
+        margin-bottom: 12px;
+      }
+
+      .brand h1 {
         margin: 0;
-        font-size: 1.6rem;
+        letter-spacing: 0.08em;
+        font-size: clamp(1.5rem, 4.5vw, 2.4rem);
+        font-weight: 800;
       }
 
-      p {
-        margin: 10px 0 22px;
+      .brand p {
+        margin: 6px 0 0;
         color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .title-row {
+        border: 1px solid var(--line);
+        text-align: center;
+        padding: 8px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        margin-bottom: 10px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .box {
+        border: 1px solid var(--line);
+        padding: 10px;
+      }
+
+      .box h2 {
+        margin: 0 0 10px;
+        font-size: 0.98rem;
+        letter-spacing: 0.05em;
       }
 
       form {
         display: grid;
-        gap: 14px;
+        gap: 10px;
       }
 
       label {
-        font-weight: 600;
-        font-size: 0.95rem;
+        display: block;
+        margin-bottom: 5px;
+        font-size: 0.82rem;
+        color: var(--muted);
+        letter-spacing: 0.03em;
       }
 
       input,
       textarea,
       button {
         width: 100%;
-        border-radius: 10px;
-        border: 1px solid var(--border);
         font: inherit;
       }
 
       input,
       textarea {
-        padding: 11px 12px;
-        color: var(--text);
+        background: #000;
+        color: var(--ink);
+        border: 1px solid var(--line);
+        padding: 9px;
       }
 
       textarea {
-        min-height: 120px;
+        min-height: 130px;
         resize: vertical;
       }
 
-      input:focus,
-      textarea:focus {
-        outline: 2px solid #bfd0ff;
-        outline-offset: 1px;
-      }
-
       button {
-        border: none;
-        background: var(--accent);
-        color: #fff;
+        border: 1px solid var(--ink);
+        background: var(--ink);
+        color: #000;
         font-weight: 700;
-        padding: 12px 14px;
+        padding: 9px;
+        letter-spacing: 0.04em;
         cursor: pointer;
       }
 
-      button:disabled {
-        opacity: 0.6;
-        cursor: wait;
+      button:disabled { opacity: 0.65; cursor: wait; }
+
+      .status { min-height: 18px; font-size: 0.86rem; }
+      .ok { color: #d8ffd8; }
+      .err { color: #ffd2d2; }
+
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.82rem;
       }
 
-      .status {
-        min-height: 22px;
-        font-size: 0.95rem;
+      .table th,
+      .table td {
+        border: 1px solid var(--line);
+        padding: 6px;
+        vertical-align: top;
       }
 
-      .ok {
-        color: #0f6a37;
+      .table th {
+        text-align: left;
+        color: var(--muted);
+        font-weight: 700;
       }
 
-      .err {
-        color: #9f1b1b;
+      .table a {
+        color: var(--ink);
+        text-decoration: underline;
+        text-underline-offset: 2px;
+        font-weight: 700;
+      }
+
+      .foot {
+        margin-top: 10px;
+        border-top: 1px solid var(--line);
+        padding-top: 8px;
+        color: var(--muted);
+        font-size: 0.76rem;
+        text-align: center;
+        letter-spacing: 0.03em;
+      }
+
+      @media (max-width: 780px) {
+        .grid { grid-template-columns: 1fr; }
       }
     </style>
   </head>
   <body>
-    <main class="card">
-      <h1>Request personal software</h1>
-      <p>Tell us what you want built. We will review it and notify you by email when it is ready.</p>
+    <main class="sheet">
+      <header class="brand">
+        <h1>REQUEST BOARD</h1>
+        <p>Personal software intake and shipped products log</p>
+      </header>
 
-      <form id="request-form">
-        <div>
-          <label for="memo">What do you want?</label>
-          <textarea id="memo" name="memo" maxlength="5000" required></textarea>
-        </div>
+      <div class="title-row">SUBMIT REQUEST / IMPLEMENTED PRODUCTS</div>
 
-        <div>
-          <label for="email">Email for notification</label>
-          <input id="email" name="email" type="email" maxlength="320" required />
-        </div>
+      <section class="grid">
+        <section class="box">
+          <h2>NEW REQUEST</h2>
+          <form id="request-form">
+            <div>
+              <label for="memo">DESCRIPTION</label>
+              <textarea id="memo" name="memo" maxlength="5000" required></textarea>
+            </div>
 
-        <button id="submit-btn" type="submit">Submit request</button>
-        <div id="status" class="status" aria-live="polite"></div>
-      </form>
+            <div>
+              <label for="email">EMAIL</label>
+              <input id="email" name="email" type="email" maxlength="320" required />
+            </div>
+
+            <button id="submit-btn" type="submit">SUBMIT</button>
+            <div id="status" class="status" aria-live="polite"></div>
+          </form>
+        </section>
+
+        <aside class="box">
+          <h2>IMPLEMENTED PRODUCTS</h2>
+          <table class="table" aria-label="Implemented products">
+            <thead>
+              <tr>
+                <th>Project</th>
+                <th>Description</th>
+                <th>Updated</th>
+              </tr>
+            </thead>
+            <tbody id="project-table-body">
+              <tr>
+                <td colspan="3">Loading projects...</td>
+              </tr>
+            </tbody>
+          </table>
+        </aside>
+      </section>
+
+      <div class="foot">All submissions are stored via Google Sheets API.</div>
     </main>
 
     <script>
+      const fallbackProjects = [
+        { name: "qrcodemachine", description: "QR code generator", url: "#", updatedAt: "" },
+        { name: "productshot", description: "Product image utility", url: "#", updatedAt: "" },
+        { name: "personal-software-request", description: "Request intake app", url: "#", updatedAt: "" }
+      ];
+
+      function formatDate(value) {
+        if (!value) return "-";
+        const d = new Date(value);
+        return Number.isNaN(d.getTime()) ? "-" : d.toLocaleDateString();
+      }
+
+      function renderProjects(projects) {
+        const body = document.getElementById("project-table-body");
+        body.innerHTML = "";
+
+        projects.forEach((project) => {
+          const row = document.createElement("tr");
+          const safeUrl = project.url && project.url !== "#" ? project.url : null;
+          row.innerHTML = `
+            <td>${safeUrl ? `<a href="${safeUrl}" target="_blank" rel="noreferrer">${project.name}</a>` : project.name}</td>
+            <td>${project.description || "No description"}</td>
+            <td>${formatDate(project.updatedAt)}</td>
+          `;
+          body.appendChild(row);
+        });
+      }
+
+      async function loadProjects() {
+        try {
+          const response = await fetch("/api/projects");
+          if (!response.ok) throw new Error("Project feed unavailable");
+          const data = await response.json();
+          if (!Array.isArray(data.projects) || !data.projects.length) throw new Error("No projects");
+          renderProjects(data.projects);
+        } catch (error) {
+          renderProjects(fallbackProjects);
+        }
+      }
+
+      loadProjects();
+
       const form = document.getElementById("request-form");
       const statusEl = document.getElementById("status");
       const submitBtn = document.getElementById("submit-btn");
@@ -157,16 +284,15 @@
             body: JSON.stringify(payload)
           });
 
-          if (!response.ok) {
-            throw new Error("Request failed");
-          }
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok) throw new Error(data.error || "Request failed");
 
           form.reset();
           statusEl.className = "status ok";
-          statusEl.textContent = "Request submitted.";
+          statusEl.textContent = "Submitted.";
         } catch (error) {
           statusEl.className = "status err";
-          statusEl.textContent = "Could not submit right now. Please try again.";
+          statusEl.textContent = error.message || "Could not submit.";
         } finally {
           submitBtn.disabled = false;
         }
