@@ -344,6 +344,82 @@
       const form = document.getElementById("request-form");
       const statusEl = document.getElementById("status");
       const submitBtn = document.getElementById("submit-btn");
+      const sheetEl = document.querySelector(".sheet");
+      const MATRIX_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*+=-";
+
+      function randomMatrixChar() {
+        return MATRIX_CHARS[Math.floor(Math.random() * MATRIX_CHARS.length)];
+      }
+
+      function scrambleText(value) {
+        return value
+          .split("")
+          .map((char) => {
+            if (char === " " || char === "\n" || char === "\t") return char;
+            return randomMatrixChar();
+          })
+          .join("");
+      }
+
+      function runMatrixSweep(root) {
+        if (!root) return Promise.resolve();
+
+        const walker = document.createTreeWalker(
+          root,
+          NodeFilter.SHOW_TEXT,
+          {
+            acceptNode(node) {
+              if (!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+              const parentTag = node.parentElement?.tagName;
+              if (!parentTag) return NodeFilter.FILTER_REJECT;
+              if (["SCRIPT", "STYLE", "TEXTAREA", "INPUT"].includes(parentTag)) {
+                return NodeFilter.FILTER_REJECT;
+              }
+              return NodeFilter.FILTER_ACCEPT;
+            }
+          }
+        );
+
+        const nodes = [];
+        while (walker.nextNode()) {
+          const textNode = walker.currentNode;
+          const range = document.createRange();
+          range.selectNodeContents(textNode);
+          const top = range.getBoundingClientRect().top || 0;
+          nodes.push({ node: textNode, original: textNode.nodeValue, top });
+        }
+
+        if (!nodes.length) return Promise.resolve();
+
+        nodes.sort((a, b) => a.top - b.top);
+        const minTop = nodes[0].top;
+        const maxTop = nodes[nodes.length - 1].top;
+        const span = Math.max(maxTop - minTop, 1);
+
+        const sweepMs = 260;
+        const scrambleMs = 160;
+        const tickMs = 32;
+
+        nodes.forEach((entry) => {
+          const weight = (entry.top - minTop) / span;
+          const delay = Math.floor(weight * sweepMs);
+
+          window.setTimeout(() => {
+            const intervalId = window.setInterval(() => {
+              entry.node.nodeValue = scrambleText(entry.original);
+            }, tickMs);
+
+            window.setTimeout(() => {
+              window.clearInterval(intervalId);
+              entry.node.nodeValue = entry.original;
+            }, scrambleMs);
+          }, delay);
+        });
+
+        return new Promise((resolve) => {
+          window.setTimeout(resolve, sweepMs + scrambleMs + 24);
+        });
+      }
 
       form.addEventListener("submit", async (event) => {
         event.preventDefault();
@@ -369,6 +445,7 @@
           form.reset();
           statusEl.className = "status ok";
           statusEl.textContent = "Submitted.";
+          await runMatrixSweep(sheetEl);
         } catch (error) {
           statusEl.className = "status err";
           statusEl.textContent = error.message || "Could not submit.";
