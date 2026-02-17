@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Request Personal Software</title>
+    <style>
+      :root {
+        --bg: #f5f8ff;
+        --card: #ffffff;
+        --text: #15213a;
+        --accent: #2c5cff;
+        --muted: #63708d;
+        --border: #d9e2ff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Avenir Next", "Segoe UI", sans-serif;
+        color: var(--text);
+        background: radial-gradient(circle at 15% 20%, #e2eaff 0%, var(--bg) 45%),
+          linear-gradient(120deg, #f9fbff 0%, #ecf2ff 100%);
+        display: grid;
+        place-items: center;
+        padding: 24px;
+      }
+
+      .card {
+        width: min(100%, 600px);
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 28px;
+        box-shadow: 0 10px 40px rgba(21, 33, 58, 0.08);
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 1.6rem;
+      }
+
+      p {
+        margin: 10px 0 22px;
+        color: var(--muted);
+      }
+
+      form {
+        display: grid;
+        gap: 14px;
+      }
+
+      label {
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+
+      input,
+      textarea,
+      button {
+        width: 100%;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        font: inherit;
+      }
+
+      input,
+      textarea {
+        padding: 11px 12px;
+        color: var(--text);
+      }
+
+      textarea {
+        min-height: 120px;
+        resize: vertical;
+      }
+
+      input:focus,
+      textarea:focus {
+        outline: 2px solid #bfd0ff;
+        outline-offset: 1px;
+      }
+
+      button {
+        border: none;
+        background: var(--accent);
+        color: #fff;
+        font-weight: 700;
+        padding: 12px 14px;
+        cursor: pointer;
+      }
+
+      button:disabled {
+        opacity: 0.6;
+        cursor: wait;
+      }
+
+      .status {
+        min-height: 22px;
+        font-size: 0.95rem;
+      }
+
+      .ok {
+        color: #0f6a37;
+      }
+
+      .err {
+        color: #9f1b1b;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <h1>Request personal software</h1>
+      <p>Tell us what you want built. We will review it and notify you by email when it is ready.</p>
+
+      <form id="request-form">
+        <div>
+          <label for="memo">What do you want?</label>
+          <textarea id="memo" name="memo" maxlength="5000" required></textarea>
+        </div>
+
+        <div>
+          <label for="email">Email for notification</label>
+          <input id="email" name="email" type="email" maxlength="320" required />
+        </div>
+
+        <button id="submit-btn" type="submit">Submit request</button>
+        <div id="status" class="status" aria-live="polite"></div>
+      </form>
+    </main>
+
+    <script>
+      const form = document.getElementById("request-form");
+      const statusEl = document.getElementById("status");
+      const submitBtn = document.getElementById("submit-btn");
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        statusEl.className = "status";
+        statusEl.textContent = "Sending...";
+        submitBtn.disabled = true;
+
+        const payload = {
+          memo: form.memo.value.trim(),
+          email: form.email.value.trim()
+        };
+
+        try {
+          const response = await fetch("/api/submit", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+
+          if (!response.ok) {
+            throw new Error("Request failed");
+          }
+
+          form.reset();
+          statusEl.className = "status ok";
+          statusEl.textContent = "Request submitted.";
+        } catch (error) {
+          statusEl.className = "status err";
+          statusEl.textContent = "Could not submit right now. Please try again.";
+        } finally {
+          submitBtn.disabled = false;
+        }
+      });
+    </script>
+  </body>
+</html>
