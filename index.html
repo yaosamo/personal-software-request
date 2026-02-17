@@ -289,7 +289,7 @@
               <thead>
                 <tr>
                   <th>Project</th>
-                  <th>Updated</th>
+                  <th>Released</th>
                 </tr>
               </thead>
               <tbody id="project-table-body">
@@ -306,16 +306,10 @@
 
     <script>
       const fallbackProjects = [
-        { name: "qrcodemachine", description: "QR code generator", url: "#", updatedAt: "" },
-        { name: "productshot", description: "Product image utility", url: "#", updatedAt: "" },
-        { name: "personal-software-request", description: "Request intake app", url: "#", updatedAt: "" }
+        { name: "QR Code Machine", url: "https://qrcodemachine.vercel.app", releasedYear: 2025 },
+        { name: "Product Shot", url: "https://productshot.vercel.app", releasedYear: 2025 },
+        { name: "Personal Software Request", url: "https://personal-software-request.vercel.app", releasedYear: 2026 }
       ];
-
-      function formatDate(value) {
-        if (!value) return "-";
-        const d = new Date(value);
-        return Number.isNaN(d.getTime()) ? "-" : d.toLocaleDateString();
-      }
 
       function renderProjects(projects) {
         const body = document.getElementById("project-table-body");
@@ -326,7 +320,7 @@
           const safeUrl = project.url && project.url !== "#" ? project.url : null;
           row.innerHTML = `
             <td>${safeUrl ? `<a href="${safeUrl}" target="_blank" rel="noreferrer">${project.name}</a>` : project.name}</td>
-            <td>${formatDate(project.updatedAt)}</td>
+            <td>${project.releasedYear || "-"}</td>
           `;
           body.appendChild(row);
         });
@@ -334,8 +328,8 @@
 
       async function loadProjects() {
         try {
-          const response = await fetch("/api/projects");
-          if (!response.ok) throw new Error("Project feed unavailable");
+          const response = await fetch("/projects.json");
+          if (!response.ok) throw new Error("Project list unavailable");
           const data = await response.json();
           if (!Array.isArray(data.projects) || !data.projects.length) throw new Error("No projects");
           renderProjects(data.projects);
