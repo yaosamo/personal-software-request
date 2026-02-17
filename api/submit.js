@@ -41,6 +41,17 @@ module.exports = async (req, res) => {
       return res.status(502).json({ error: "Failed to write to Google" });
     }
 
+    let responseData = null;
+    try {
+      responseData = await writeResponse.json();
+    } catch (error) {
+      return res.status(502).json({ error: "Google webhook did not return JSON" });
+    }
+
+    if (!responseData?.ok) {
+      return res.status(502).json({ error: "Google webhook returned unsuccessful response" });
+    }
+
     return res.status(200).json({ ok: true });
   } catch (error) {
     return res.status(502).json({ error: "Google write request failed" });
