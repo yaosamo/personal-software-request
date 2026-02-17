@@ -1,5 +1,21 @@
+const { google } = require("googleapis");
+
 function isValidEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function getPrivateKey() {
+  if (process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY_B64) {
+    return Buffer.from(process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY_B64, "base64").toString(
+      "utf8"
+    );
+  }
+
+  if (process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY) {
+    return process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY.replace(/\\n/g, "\n");
+  }
+
+  return "";
 }
 
 module.exports = async (req, res) => {
@@ -7,7 +23,15 @@ module.exports = async (req, res) => {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
+  let body = req.body;
+  if (typeof req.body === "string") {
+    try {
+      body = JSON.parse(req.body);
+    } catch (error) {
+      return res.status(400).json({ error: "Invalid JSON body" });
+    }
+  }
+
   const memo = (body?.memo || "").trim();
   const email = (body?.email || "").trim().toLowerCase();
 
@@ -19,41 +43,40 @@ module.exports = async (req, res) => {
     return res.status(400).json({ error: "Valid email is required" });
   }
 
-  const webhookUrl = process.env.GOOGLE_APPS_SCRIPT_URL;
-  if (!webhookUrl) {
-    return res.status(500).json({ error: "Missing GOOGLE_APPS_SCRIPT_URL" });
+  const spreadsheetId = process.env.GOOGLE_SHEETS_ID;
+  const range = process.env.GOOGLE_SHEETS_RANGE || "Sheet1!A:C";
+  const clientEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
+  const privateKey = getPrivateKey();
+
+  if (!spreadsheetId || !clientEmail || !privateKey) {
+    return res.status(500).json({
+      error:
+        "Missing Google API configuration. Required: GOOGLE_SHEETS_ID, GOOGLE_SERVICE_ACCOUNT_EMAIL, and private key env"
+    });
   }
 
-  const payload = {
-    memo,
-    email,
-    submittedAt: new Date().toISOString()
-  };
+  const submittedAt = new Date().toISOString();
 
   try {
-    const writeResponse = await fetch(webhookUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+    const auth = new google.auth.JWT({
+      email: clientEmail,
+      key: privateKey,
+      scopes: ["https://www.googleapis.com/auth/spreadsheets"]
     });
 
-    if (!writeResponse.ok) {
-      return res.status(502).json({ error: "Failed to write to Google" });
-    }
+    const sheets = google.sheets({ version: "v4", auth });
 
-    let responseData = null;
-    try {
-      responseData = await writeResponse.json();
-    } catch (error) {
-      return res.status(502).json({ error: "Google webhook did not return JSON" });
-    }
-
-    if (!responseData?.ok) {
-      return res.status(502).json({ error: "Google webhook returned unsuccessful response" });
-    }
+    await sheets.spreadsheets.values.append({
+      spreadsheetId,
+      range,
+      valueInputOption: "USER_ENTERED",
+      requestBody: {
+        values: [[submittedAt, email, memo]]
+      }
+    });
 
     return res.status(200).json({ ok: true });
   } catch (error) {
-    return res.status(502).json({ error: "Google write request failed" });
+    return res.status(502).json({ error: "Google Sheets API write failed" });
   }
 };

@@ -1,53 +1,49 @@
 # Personal Software Request
 
-Minimal Vercel site to collect software requests with memo + email and store responses in a Google Doc through Google Apps Script.
+Minimal Vercel site to collect software requests with memo + email and store responses directly in Google Sheets via Google Sheets API.
 
 ## Stack
 
 - Static HTML form (`index.html`)
 - Vercel Serverless Function (`api/submit.js`)
-- Google Apps Script webhook appending to Google Doc
+- Google Sheets API (service account auth)
 
 ## Run locally
 
 1. Install Vercel CLI: `npm i -g vercel`
-2. Set env var in this project:
-   - `vercel env add GOOGLE_APPS_SCRIPT_URL`
+2. Set env vars in this project:
+   - `GOOGLE_SHEETS_ID`
+   - `GOOGLE_SHEETS_RANGE` (optional, defaults to `Sheet1!A:C`)
+   - `GOOGLE_SERVICE_ACCOUNT_EMAIL`
+   - `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY_B64` (recommended) or `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY`
 3. Start dev server:
    - `npm run dev`
 
-## Google setup (response storage in Google Doc)
+## Google setup (true API, no Apps Script)
 
-1. Create a Google Doc where submissions should be appended.
-2. Copy the Google Doc ID from the URL:
-   - `https://docs.google.com/document/d/<DOC_ID>/edit`
-3. Open https://script.google.com and create a new Apps Script project.
-3. Paste script below and save:
+1. In Google Cloud, enable **Google Sheets API**.
+2. Create a **Service Account** and generate a JSON key.
+3. Share your target spreadsheet with the service account email as **Editor**.
+4. Add these Vercel environment variables:
+   - `GOOGLE_SHEETS_ID`: spreadsheet ID from URL
+   - `GOOGLE_SHEETS_RANGE`: for example `Sheet1!A:C`
+   - `GOOGLE_SERVICE_ACCOUNT_EMAIL`: value from JSON key `client_email`
+   - `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY_B64`: base64 of JSON key `private_key`
 
-```javascript
-function doPost(e) {
-  const doc = DocumentApp.openById("YOUR_DOC_ID_HERE");
-  const body = doc.getBody();
-  const data = JSON.parse(e.postData.contents || "{}");
+To generate base64 private key safely:
 
-  body.appendParagraph("----");
-  body.appendParagraph("submittedAt: " + (data.submittedAt || new Date().toISOString()));
-  body.appendParagraph("email: " + (data.email || ""));
-  body.appendParagraph("memo: " + (data.memo || ""));
-  body.appendParagraph("");
-  doc.saveAndClose();
-
-  return ContentService.createTextOutput(JSON.stringify({ ok: true }))
-    .setMimeType(ContentService.MimeType.JSON);
-}
+```bash
+printf '%s' '-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n' | base64
 ```
 
-4. Replace `YOUR_DOC_ID_HERE` with your real doc ID.
-5. Deploy script:
-   - **Deploy -> New deployment -> Web app**
-   - Execute as: `Me`
-   - Who has access: `Anyone`
-6. Copy the web app URL and set it as `GOOGLE_APPS_SCRIPT_URL` in Vercel.
+Set env vars with Vercel CLI:
+
+```bash
+vercel env add GOOGLE_SHEETS_ID production
+vercel env add GOOGLE_SHEETS_RANGE production
+vercel env add GOOGLE_SERVICE_ACCOUNT_EMAIL production
+vercel env add GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY_B64 production
+```
 
 ## Deploy to Vercel
 
