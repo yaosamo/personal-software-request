@@ -234,61 +234,6 @@
         border-bottom-color: var(--fg);
       }
 
-      .controls {
-        margin-top: 16px;
-        border: 1px solid var(--hair);
-        padding: 8px;
-      }
-
-      .controls h3 {
-        margin: 0 0 8px;
-        font-size: 11px;
-        letter-spacing: var(--track-2);
-        color: var(--muted);
-      }
-
-      .control-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-      }
-
-      .control-grid .field {
-        gap: 4px;
-      }
-
-      .control-grid label {
-        font-size: 10px;
-      }
-
-      .control-grid input {
-        padding: 8px;
-        font-size: 11px;
-      }
-
-      .control-actions {
-        margin-top: 8px;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-      }
-
-      .toggle-row {
-        margin-top: 8px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-
-      .toggle-row label {
-        margin: 0;
-      }
-
-      .toggle-row input[type="checkbox"] {
-        width: 16px;
-        height: 16px;
-      }
-
       .meta {
         text-align: center;
         color: var(--muted);
@@ -338,37 +283,6 @@
               <div id="status" class="status" aria-live="polite"></div>
             </form>
 
-            <section class="controls">
-              <h3>Animation Controls (Test)</h3>
-              <div class="control-grid">
-                <div class="field">
-                  <label for="ctrl-sweep">Sweep ms (top to bottom)</label>
-                  <input id="ctrl-sweep" type="number" min="200" max="15000" step="100" value="1000" />
-                </div>
-                <div class="field">
-                  <label for="ctrl-spin">Spin ms per char</label>
-                  <input id="ctrl-spin" type="number" min="200" max="15000" step="100" value="2000" />
-                </div>
-                <div class="field">
-                  <label for="ctrl-stagger">Char stagger ms</label>
-                  <input id="ctrl-stagger" type="number" min="1" max="500" step="1" value="80" />
-                </div>
-                <div class="field">
-                  <label for="ctrl-tick">Tick ms</label>
-                  <input id="ctrl-tick" type="number" min="16" max="500" step="1" value="20" />
-                </div>
-              </div>
-
-              <div class="toggle-row">
-                <input id="ctrl-submit-trigger" type="checkbox" checked />
-                <label for="ctrl-submit-trigger">Trigger on submit</label>
-              </div>
-
-              <div class="control-actions">
-                <button id="run-wave-test-btn" type="button">Run Animation Test</button>
-                <button id="reset-wave-btn" type="button">Reset Defaults</button>
-              </div>
-            </section>
           </section>
 
           <aside class="pane">
@@ -433,44 +347,13 @@
       const submitBtn = document.getElementById("submit-btn");
       const sheetEl = document.querySelector(".sheet");
       const MATRIX_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*+=-";
-      let testTriggerOnSubmit = true;
-      let isWaveRunning = false;
-      const controlSweep = document.getElementById("ctrl-sweep");
-      const controlSpin = document.getElementById("ctrl-spin");
-      const controlStagger = document.getElementById("ctrl-stagger");
-      const controlTick = document.getElementById("ctrl-tick");
-      const controlSubmitTrigger = document.getElementById("ctrl-submit-trigger");
-      const runWaveTestBtn = document.getElementById("run-wave-test-btn");
-      const resetWaveBtn = document.getElementById("reset-wave-btn");
-
-      const defaultWaveConfig = {
+      const WAVE_CONFIG = {
         nodeSweepMs: 1000,
         spinMs: 2000,
         charStaggerMs: 80,
         tickMs: 20
       };
-
-      function clamp(value, min, max) {
-        return Math.min(max, Math.max(min, value));
-      }
-
-      function currentWaveConfig() {
-        return {
-          nodeSweepMs: clamp(Number(controlSweep.value) || defaultWaveConfig.nodeSweepMs, 200, 15000),
-          spinMs: clamp(Number(controlSpin.value) || defaultWaveConfig.spinMs, 200, 15000),
-          charStaggerMs: clamp(Number(controlStagger.value) || defaultWaveConfig.charStaggerMs, 1, 500),
-          tickMs: clamp(Number(controlTick.value) || defaultWaveConfig.tickMs, 16, 500)
-        };
-      }
-
-      function applyControlConfig(config) {
-        controlSweep.value = String(config.nodeSweepMs);
-        controlSpin.value = String(config.spinMs);
-        controlStagger.value = String(config.charStaggerMs);
-        controlTick.value = String(config.tickMs);
-      }
-
-      applyControlConfig(defaultWaveConfig);
+      let isWaveRunning = false;
 
       function randomMatrixChar() {
         return MATRIX_CHARS[Math.floor(Math.random() * MATRIX_CHARS.length)];
@@ -486,7 +369,7 @@
           .join("");
       }
 
-      function runMatrixWave(root, config = currentWaveConfig()) {
+      function runMatrixWave(root, config = WAVE_CONFIG) {
         if (!root || isWaveRunning) return Promise.resolve();
         isWaveRunning = true;
 
@@ -592,25 +475,9 @@
         });
       }
 
-      controlSubmitTrigger.addEventListener("change", () => {
-        testTriggerOnSubmit = controlSubmitTrigger.checked;
-      });
-
-      runWaveTestBtn.addEventListener("click", () => {
-        runMatrixWave(sheetEl);
-      });
-
-      resetWaveBtn.addEventListener("click", () => {
-        applyControlConfig(defaultWaveConfig);
-        controlSubmitTrigger.checked = true;
-        testTriggerOnSubmit = true;
-      });
-
       form.addEventListener("submit", async (event) => {
         event.preventDefault();
-        if (testTriggerOnSubmit) {
-          runMatrixWave(sheetEl);
-        }
+        runMatrixWave(sheetEl);
         statusEl.className = "status";
         statusEl.textContent = "Sending...";
         submitBtn.disabled = true;
