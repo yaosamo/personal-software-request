@@ -1,0 +1,19 @@
+{
+  "projects": [
+    {
+      "name": "QR Code Machine",
+      "url": "https://qrcodemachine.vercel.app",
+      "releasedYear": 2025
+    },
+    {
+      "name": "Product Shot",
+      "url": "https://productshot.vercel.app",
+      "releasedYear": 2025
+    },
+    {
+      "name": "Personal Software Request",
+      "url": "https://personal-software-request.vercel.app",
+      "releasedYear": 2026
+    }
+  ]
+}
