@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Request Board</title>
+    <style>
+      @font-face {
+        font-family: "Departure Mono";
+        src:
+          url("https://departuremono.com/assets/DepartureMono-Regular.woff2") format("woff2"),
+          url("https://departuremono.com/assets/DepartureMono-Regular.woff") format("woff");
+        font-display: swap;
+      }
+
+      :root {
+        --bg: #0b0b0c;
+        --fg: #f2f2f2;
+        --muted: #bdbdbd;
+        --line: rgba(242, 242, 242, 0.22);
+        --hair: rgba(242, 242, 242, 0.14);
+        --disabled: rgba(242, 242, 242, 0.45);
+        --track-1: 0.12em;
+        --track-2: 0.18em;
+        --track-3: 0.07em;
+      }
+
+      * {
+        box-sizing: border-box;
+        border-radius: 0;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--fg);
+        text-transform: uppercase;
+        font-family: "Departure Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: var(--track-3);
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.04;
+        background-image: radial-gradient(circle at 1px 1px, #ffffff 1px, transparent 0);
+        background-size: 8px 8px;
+      }
+
+      main {
+        max-width: 840px;
+        margin: 48px auto 64px;
+        padding: 0 16px;
+      }
+
+      .sheet {
+        border: 1px solid var(--line);
+      }
+
+      .section {
+        padding: 24px 16px;
+      }
+
+      .section + .section {
+        border-top: 1px solid var(--hair);
+      }
+
+      h1,
+      h2 {
+        margin: 0;
+        letter-spacing: var(--track-1);
+        font-weight: 800;
+      }
+
+      h1 {
+        font-size: 28px;
+      }
+
+      h2 {
+        font-size: 16px;
+      }
+
+      .subtitle {
+        margin: 12px 0 0;
+        color: var(--muted);
+        letter-spacing: var(--track-2);
+        font-size: 12px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        border-top: 1px solid var(--hair);
+      }
+
+      .grid > .pane {
+        padding: 24px 16px;
+      }
+
+      .grid > .pane + .pane {
+        border-left: 1px solid var(--hair);
+      }
+
+      form {
+        display: grid;
+        gap: 16px;
+      }
+
+      .field {
+        display: grid;
+        gap: 8px;
+      }
+
+      label {
+        color: var(--muted);
+        letter-spacing: var(--track-2);
+        font-weight: 600;
+        font-size: 11px;
+      }
+
+      input,
+      textarea,
+      button {
+        width: 100%;
+        font: inherit;
+        text-transform: uppercase;
+        letter-spacing: var(--track-3);
+      }
+
+      input,
+      textarea {
+        border: 1px solid var(--line);
+        background: transparent;
+        color: var(--fg);
+        padding: 12px;
+        font-size: 13px;
+        font-weight: 500;
+      }
+
+      input::placeholder,
+      textarea::placeholder {
+        color: var(--disabled);
+      }
+
+      input:focus,
+      textarea:focus {
+        outline: none;
+        border-color: var(--fg);
+      }
+
+      textarea {
+        min-height: 128px;
+        resize: vertical;
+      }
+
+      button {
+        border: 1px solid var(--fg);
+        background: transparent;
+        color: var(--fg);
+        padding: 12px 16px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: var(--track-2);
+        cursor: pointer;
+        transition: background-color 120ms ease, color 120ms ease, opacity 120ms ease;
+      }
+
+      button:hover {
+        background: var(--fg);
+        color: var(--bg);
+      }
+
+      button:active {
+        opacity: 0.85;
+      }
+
+      button:disabled {
+        border-color: var(--disabled);
+        color: var(--disabled);
+        cursor: wait;
+      }
+
+      .status {
+        min-height: 16px;
+        font-size: 11px;
+        letter-spacing: var(--track-2);
+      }
+
+      .ok {
+        color: var(--fg);
+      }
+
+      .err {
+        color: #f0b3b3;
+      }
+
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+        letter-spacing: var(--track-3);
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      }
+
+      .table th,
+      .table td {
+        border: 1px solid var(--hair);
+        padding: 8px;
+        vertical-align: top;
+      }
+
+      .table th {
+        color: var(--muted);
+        font-weight: 600;
+        letter-spacing: var(--track-2);
+        text-align: left;
+      }
+
+      .table td:last-child,
+      .table th:last-child {
+        text-align: right;
+      }
+
+      .table a {
+        color: var(--fg);
+        text-decoration: none;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .table a:hover {
+        border-bottom-color: var(--fg);
+      }
+
+      .meta {
+        text-align: center;
+        color: var(--muted);
+        letter-spacing: var(--track-2);
+        font-size: 11px;
+      }
+
+      @media (max-width: 800px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+
+        .grid > .pane + .pane {
+          border-left: none;
+          border-top: 1px solid var(--hair);
+        }
+
+        h1 {
+          font-size: 24px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="sheet">
+        <section class="section">
+          <h1>Request Personal Software</h1>
+          <p class="subtitle">Submit a build request and receive email notification when delivered.</p>
+        </section>
+
+        <section class="grid">
+          <section class="pane">
+            <h2>New Request</h2>
+            <form id="request-form">
+              <div class="field">
+                <label for="memo">Description</label>
+                <textarea id="memo" name="memo" maxlength="5000" placeholder="Describe software request" required></textarea>
+              </div>
+
+              <div class="field">
+                <label for="email">Email</label>
+                <input id="email" name="email" type="email" maxlength="320" placeholder="name@example.com" required />
+              </div>
+
+              <button id="submit-btn" type="submit">Submit Request</button>
+              <div id="status" class="status" aria-live="polite"></div>
+            </form>
+          </section>
+
+          <aside class="pane">
+            <h2>Implemented Products</h2>
+            <table class="table" aria-label="Implemented products">
+              <thead>
+                <tr>
+                  <th>Project</th>
+                  <th>Released</th>
+                </tr>
+              </thead>
+              <tbody id="project-table-body">
+                <tr>
+                  <td colspan="2">Loading projects...</td>
+                </tr>
+              </tbody>
+            </table>
+          </aside>
+        </section>
+
+      </section>
+    </main>
+
+    <script>
+      const fallbackProjects = [
+        { name: "QR Code Machine", url: "https://qrcodemachine.vercel.app", releasedYear: 2025 },
+        { name: "Product Shot", url: "https://productshot.vercel.app", releasedYear: 2025 },
+        { name: "Personal Software Request", url: "https://personal-software-request.vercel.app", releasedYear: 2026 }
+      ];
+
+      function renderProjects(projects) {
+        const body = document.getElementById("project-table-body");
+        body.innerHTML = "";
+
+        projects.forEach((project) => {
+          const row = document.createElement("tr");
+          const safeUrl = project.url && project.url !== "#" ? project.url : null;
+          row.innerHTML = `
+            <td>${safeUrl ? `<a href="${safeUrl}" target="_blank" rel="noreferrer">${project.name}</a>` : project.name}</td>
+            <td>${project.releasedYear || "-"}</td>
+          `;
+          body.appendChild(row);
+        });
+      }
+
+      async function loadProjects() {
+        try {
+          const response = await fetch("/projects.json");
+          if (!response.ok) throw new Error("Project list unavailable");
+          const data = await response.json();
+          if (!Array.isArray(data.projects) || !data.projects.length) throw new Error("No projects");
+          renderProjects(data.projects);
+        } catch (error) {
+          renderProjects(fallbackProjects);
+        }
+      }
+
+      loadProjects();
+
+      const form = document.getElementById("request-form");
+      const statusEl = document.getElementById("status");
+      const submitBtn = document.getElementById("submit-btn");
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        statusEl.className = "status";
+        statusEl.textContent = "Sending...";
+        submitBtn.disabled = true;
+
+        const payload = {
+          memo: form.memo.value.trim(),
+          email: form.email.value.trim()
+        };
+
+        try {
+          const response = await fetch("/api/submit", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok) throw new Error(data.error || "Request failed");
+
+          form.reset();
+          statusEl.className = "status ok";
+          statusEl.textContent = "Submitted.";
+        } catch (error) {
+          statusEl.className = "status err";
+          statusEl.textContent = error.message || "Could not submit.";
+        } finally {
+          submitBtn.disabled = false;
+        }
+      });
+    </script>
+  </body>
+</html>
