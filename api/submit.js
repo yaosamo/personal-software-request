@@ -43,9 +43,9 @@ module.exports = async (req, res) => {
     return res.status(400).json({ error: "Valid email is required" });
   }
 
-  const spreadsheetId = process.env.GOOGLE_SHEETS_ID;
-  const range = process.env.GOOGLE_SHEETS_RANGE || "Sheet1!A:C";
-  const clientEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
+  const spreadsheetId = (process.env.GOOGLE_SHEETS_ID || "").trim();
+  const range = (process.env.GOOGLE_SHEETS_RANGE || "Sheet1!A:C").trim();
+  const clientEmail = (process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || "").trim();
   const privateKey = getPrivateKey();
 
   if (!spreadsheetId || !clientEmail || !privateKey) {
@@ -77,6 +77,9 @@ module.exports = async (req, res) => {
 
     return res.status(200).json({ ok: true });
   } catch (error) {
-    return res.status(502).json({ error: "Google Sheets API write failed" });
+    const googleMessage =
+      error?.response?.data?.error?.message || error?.message || "Unknown Google Sheets API error";
+    console.error("Google Sheets API write failed:", googleMessage);
+    return res.status(502).json({ error: `Google Sheets API write failed: ${googleMessage}` });
   }
 };
