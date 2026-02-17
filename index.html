@@ -396,9 +396,9 @@
         const maxTop = nodes[nodes.length - 1].top;
         const span = Math.max(maxTop - minTop, 1);
 
-        const sweepMs = 260;
-        const scrambleMs = 160;
-        const tickMs = 32;
+        const sweepMs = 3000;
+        const scrambleMs = 220;
+        const tickMs = 36;
 
         nodes.forEach((entry) => {
           const weight = (entry.top - minTop) / span;
