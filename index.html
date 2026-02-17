@@ -193,6 +193,7 @@
         border-collapse: collapse;
         font-size: 12px;
         letter-spacing: var(--track-3);
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       }
 
       .table th,
@@ -280,13 +281,12 @@
               <thead>
                 <tr>
                   <th>Project</th>
-                  <th>Description</th>
                   <th>Updated</th>
                 </tr>
               </thead>
               <tbody id="project-table-body">
                 <tr>
-                  <td colspan="3">Loading projects...</td>
+                  <td colspan="2">Loading projects...</td>
                 </tr>
               </tbody>
             </table>
@@ -318,7 +318,6 @@
           const safeUrl = project.url && project.url !== "#" ? project.url : null;
           row.innerHTML = `
             <td>${safeUrl ? `<a href="${safeUrl}" target="_blank" rel="noreferrer">${project.name}</a>` : project.name}</td>
-            <td>${project.description || "No description"}</td>
             <td>${formatDate(project.updatedAt)}</td>
           `;
           body.appendChild(row);
