@@ -40,9 +40,19 @@
         letter-spacing: var(--track-3);
       }
 
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.04;
+        background-image: radial-gradient(circle at 1px 1px, #ffffff 1px, transparent 0);
+        background-size: 8px 8px;
+      }
+
       main {
         max-width: 840px;
-        margin: 32px auto 48px;
+        margin: 48px auto 64px;
         padding: 0 16px;
       }
 
@@ -51,7 +61,7 @@
       }
 
       .section {
-        padding: 16px;
+        padding: 24px 16px;
       }
 
       .section + .section {
@@ -66,7 +76,7 @@
       }
 
       h1 {
-        font-size: 24px;
+        font-size: 28px;
       }
 
       h2 {
@@ -74,10 +84,10 @@
       }
 
       .subtitle {
-        margin: 8px 0 0;
+        margin: 12px 0 0;
         color: var(--muted);
         letter-spacing: var(--track-2);
-        font-size: 11px;
+        font-size: 12px;
       }
 
       .grid {
@@ -86,7 +96,7 @@
       }
 
       .grid > .pane {
-        padding: 16px;
+        padding: 24px 16px;
       }
 
       .grid > .pane + .pane {
@@ -95,7 +105,7 @@
 
       form {
         display: grid;
-        gap: 12px;
+        gap: 16px;
       }
 
       .field {
@@ -154,11 +164,12 @@
         font-weight: 700;
         letter-spacing: var(--track-2);
         cursor: pointer;
-        transition: opacity 120ms ease;
+        transition: background-color 120ms ease, color 120ms ease, opacity 120ms ease;
       }
 
       button:hover {
-        opacity: 0.9;
+        background: var(--fg);
+        color: var(--bg);
       }
 
       button:active {
@@ -196,7 +207,7 @@
       .table th,
       .table td {
         border: 1px solid var(--hair);
-        padding: 4px 8px;
+        padding: 8px;
         vertical-align: top;
       }
 
@@ -240,7 +251,7 @@
         }
 
         h1 {
-          font-size: 20px;
+          font-size: 24px;
         }
       }
     </style>
